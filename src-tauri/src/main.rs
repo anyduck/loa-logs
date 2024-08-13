@@ -358,12 +358,7 @@ fn load_encounters_preview(
     search: String,
     filter: SearchFilter,
 ) -> EncountersOverview {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let mut params = vec![];
 
     let join_clause = if search.len() > 2 {
@@ -514,12 +509,7 @@ fn load_encounters_preview(
 
 #[tauri::command(async)]
 fn load_encounter(window: tauri::Window, id: String) -> Encounter {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let mut encounter_stmt = conn
         .prepare_cached(
             "
@@ -806,12 +796,7 @@ fn load_encounter(window: tauri::Window, id: String) -> Encounter {
 
 #[tauri::command]
 fn get_sync_candidates(window: tauri::Window, force_resync: bool) -> Vec<i32> {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let query = if force_resync { "= '0'" } else { "IS NULL" };
     let mut stmt = conn
         .prepare_cached(&format!(
@@ -836,12 +821,7 @@ fn get_sync_candidates(window: tauri::Window, force_resync: bool) -> Vec<i32> {
 
 #[tauri::command]
 fn get_encounter_count(window: tauri::Window) -> i32 {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let mut stmt = conn
         .prepare_cached("SELECT COUNT(*) FROM encounter_preview")
         .unwrap();
@@ -853,12 +833,7 @@ fn get_encounter_count(window: tauri::Window) -> i32 {
 
 #[tauri::command]
 fn open_most_recent_encounter(window: tauri::Window) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let mut stmt = conn
         .prepare_cached(
             "
@@ -886,13 +861,7 @@ fn open_most_recent_encounter(window: tauri::Window) {
 
 #[tauri::command]
 fn toggle_encounter_favorite(window: tauri::Window, id: i32) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let mut stmt = conn
         .prepare_cached(
             "
@@ -908,12 +877,7 @@ fn toggle_encounter_favorite(window: tauri::Window, id: i32) {
 
 #[tauri::command]
 fn delete_encounter(window: tauri::Window, id: String) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     conn.execute("PRAGMA foreign_keys = ON;", params![])
         .unwrap();
     let mut stmt = conn
@@ -932,12 +896,7 @@ fn delete_encounter(window: tauri::Window, id: String) {
 
 #[tauri::command]
 fn delete_encounters(window: tauri::Window, ids: Vec<i32>) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     conn.execute("PRAGMA foreign_keys = ON;", params![])
         .unwrap();
 
@@ -1051,12 +1010,7 @@ fn delete_encounters_below_min_duration(
     min_duration: i64,
     keep_favorites: bool,
 ) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     if keep_favorites {
         conn.execute(
             "DELETE FROM encounter
@@ -1085,12 +1039,7 @@ fn delete_encounters_below_min_duration(
 
 #[tauri::command]
 fn sync(window: tauri::Window, encounter: i32, upstream: String, failed: bool) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
 
     conn.execute(
         "
@@ -1104,12 +1053,7 @@ fn sync(window: tauri::Window, encounter: i32, upstream: String, failed: bool) {
 
 #[tauri::command]
 fn delete_all_uncleared_encounters(window: tauri::Window, keep_favorites: bool) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     if keep_favorites {
         conn.execute(
             "DELETE FROM encounter
@@ -1138,12 +1082,7 @@ fn delete_all_uncleared_encounters(window: tauri::Window, keep_favorites: bool) 
 
 #[tauri::command]
 fn delete_all_encounters(window: tauri::Window, keep_favorites: bool) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
 
     if keep_favorites {
         conn.execute(
@@ -1164,12 +1103,7 @@ fn delete_all_encounters(window: tauri::Window, keep_favorites: bool) {
 
 #[tauri::command]
 fn get_db_info(window: tauri::Window, min_duration: i64) -> EncounterDbInfo {
-    let mut path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     let encounter_count = conn
         .query_row("SELECT COUNT(*) FROM encounter_preview", [], |row| {
             row.get(0)
@@ -1183,7 +1117,7 @@ fn get_db_info(window: tauri::Window, min_duration: i64) -> EncounterDbInfo {
         )
         .unwrap();
 
-    path.push("encounters.db");
+    let path = conn.path().expect("could not get db path");
     let metadata = fs::metadata(path).expect("could not get db metadata");
 
     let size_in_bytes = metadata.len();
@@ -1208,12 +1142,7 @@ fn get_db_info(window: tauri::Window, min_duration: i64) -> EncounterDbInfo {
 
 #[tauri::command]
 fn optimize_database(window: tauri::Window) {
-    let path = window
-        .app_handle()
-        .path_resolver()
-        .resource_dir()
-        .expect("could not get resource dir");
-    let conn = get_db_connection(&path).expect("could not get db connection");
+    let conn = get_db_connection(&window).expect("could not get db connection");
     conn.execute_batch(
         "
         INSERT INTO encounter_search(encounter_search) VALUES('optimize');
